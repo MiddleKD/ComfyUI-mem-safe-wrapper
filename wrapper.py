@@ -9,7 +9,7 @@ class MemSafeWrapper(ModelPatcher):
         offload_device = model_management.intermediate_device()
         if dtype is None:
             dtype = model_management.unet_dtype()
-
+    
         self.model = model.to(device=offload_device, dtype=dtype)
         self.model.eval()
         super().__init__(self.model, device, offload_device)
@@ -40,3 +40,6 @@ class MemSafeWrapper(ModelPatcher):
                 return attr            
         else:
             raise AttributeError(f"{self.__class__.__name__} does not has {name} attribute.")
+
+    def __call__(self, *args, **kwargs):
+        return self.model(*args, **kwargs)

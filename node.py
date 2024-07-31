@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 from comfy.model_patcher import ModelPatcher
 from .wrapper import MemSafeWrapper
@@ -32,3 +33,37 @@ class MakeModelMemorySafe:
     def wrap(self, model:nn.Module):
         wrapped_model = MemSafeWrapper(model)
         return (wrapped_model, )
+
+# Dummy model for test
+class SimpleDummyModel:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {}}
+    RETURN_TYPES = ("MODEL",)
+    FUNCTION = "load"
+    CATEGORY = "safewrapper"
+
+    def load(self):
+        class DummyModel(nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.layer = nn.Sequential(nn.Conv2d(3,3,3,1,1))
+            def forward(self, x):
+                return self.layer(x)
+        model = DummyModel()
+        return (model, )
+
+# Dummy run for test
+class SimpleDummyRun:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {"model":("MODEL",)}}
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "run"
+    CATEGORY = "safewrapper"
+
+    def run(self, model):
+        model_param = next(model.parameters())
+        x = torch.randn((1,3,256,256), device=model_param.device, dtype=model_param.dtype)
+        output = model(x).permute(0,2,3,1)
+        return (output, )
