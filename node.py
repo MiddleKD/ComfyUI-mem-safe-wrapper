@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from comfy.model_management import get_torch_device
 from comfy.model_patcher import ModelPatcher
 from .wrapper import MemSafeWrapper
 
@@ -25,12 +26,14 @@ class MakeModelMemorySafe:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"model":("MODEL", ),
+                             "device":(["auto", "cpu", "gpu"], "auto"),
+                             "offload":(["auto", "cpu", "gpu"], "auto"),
                              "dtype":(["auto", "fp32", "fp16", "bf16"], "auto")}}
     RETURN_TYPES = ("MODEL",)
     FUNCTION = "wrap"
     CATEGORY = "safewrapper"
 
-    def wrap(self, model:nn.Module, dtype):
+    def wrap(self, model:nn.Module, device, offload, dtype):
         if dtype == "fp32":
             dtype = torch.float32
         elif dtype == "fp16":
@@ -39,7 +42,22 @@ class MakeModelMemorySafe:
             dtype = torch.bfloat16
         else:
             dtype = None
-        wrapped_model = MemSafeWrapper(model, dtype=dtype)
+        
+        if device == "cpu":
+            device = "cpu"
+        elif device == "gpu":
+            device = get_torch_device()
+        else:
+            device = None
+        
+        if offload == "cpu":
+            offload = "cpu"
+        elif offload == "gpu":
+            offload = get_torch_device()
+        else:
+            offload = None
+        
+        wrapped_model = MemSafeWrapper(model, device=device, offload_device=offload, dtype=dtype)
         return (wrapped_model, )
 
 # Dummy model for test

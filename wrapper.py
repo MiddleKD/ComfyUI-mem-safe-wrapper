@@ -4,9 +4,11 @@ from comfy import model_management
 from comfy.model_patcher import ModelPatcher
 
 class MemSafeWrapper(ModelPatcher):
-    def __init__(self, model:torch.nn.Module, dtype:torch.dtype=None):    
-        device = model_management.get_torch_device()
-        offload_device = model_management.intermediate_device()
+    def __init__(self, model:torch.nn.Module, device:torch.device=None, offload_device:torch.device=None, dtype:torch.dtype=None):    
+        if dtype is None:
+            device = model_management.get_torch_device()
+        if offload_device is None:
+            offload_device = model_management.intermediate_device()
         if dtype is None:
             dtype = model_management.unet_dtype()
     
