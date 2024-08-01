@@ -25,13 +25,21 @@ class MakeModelMemorySafe:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"model":("MODEL", ),
-                             }}
+                             "dtype":(["auto", "fp32", "fp16", "bf16"], "auto")}}
     RETURN_TYPES = ("MODEL",)
     FUNCTION = "wrap"
     CATEGORY = "safewrapper"
 
-    def wrap(self, model:nn.Module):
-        wrapped_model = MemSafeWrapper(model)
+    def wrap(self, model:nn.Module, dtype):
+        if dtype == "fp32":
+            dtype = torch.float32
+        elif dtype == "fp16":
+            dtype = torch.float16
+        elif dtype == "bf16":
+            dtype = torch.bfloat16
+        else:
+            dtype = None
+        wrapped_model = MemSafeWrapper(model, dtype=dtype)
         return (wrapped_model, )
 
 # Dummy model for test
