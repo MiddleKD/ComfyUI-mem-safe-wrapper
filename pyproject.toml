@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-mem-safe-wrapper"
+description = "ComfyUI's Smart Memory Management efficiently manages RAM, GPU memory, and garbage collection. This feature keeps frequently used models in memory to increase inference speed, and dynamically releases less important models when memory is low to optimize resources. However, not all ComfyUI custom node developers create nodes that are compatible with Smart memory management. This includes several impressive models. Mem-safe-wrapper is a custom node that wraps these model nodes to enable ComfyUI's Smart memory management capabilities."
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/MiddleKD/ComfyUI-mem-safe-wrapper"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-mem-safe-wrapper"
+Icon = ""
